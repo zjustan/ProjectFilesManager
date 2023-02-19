@@ -31,6 +31,7 @@ public class RuleCard
     Rule rule;
 
     private TextField extensionsField;
+    private TextField pathField;
 
     private GroupBox PathEditor;
 
@@ -58,11 +59,13 @@ public class RuleCard
         extensionsField.RegisterCallback<InputEvent>(e => InitDirty());
 
 
-        var pathField = Element.Q<TextField>(PathField);
+        pathField = Element.Q<TextField>(PathField);
         pathField.value = rule.Path;
-        pathField.RegisterCallback<InputEvent>(e => rule.Path = e.newData);
-        pathField.RegisterCallback<InputEvent>(e => InitDirty());
-
+        pathField.RegisterCallback<InputEvent>(e => {
+            rule.Path = e.newData;
+            InitDirty();
+            CreatePathEditor();
+        });
 
         var denyToggle = Element.Q<Toggle>(DenyToggle);
         denyToggle.value = rule.DenyExtensions;
@@ -197,11 +200,13 @@ public class RuleCard
 
     public void CreatePathEditor()
     {
-        PathEditor.Clear();
         if (!AssetDatabase.IsValidFolder(rule.Path))
         {
+            if (pathField.panel.focusController.focusedElement == pathField)
+                return;
             rule.Path = "Assets/";
         }
+        PathEditor.Clear();
 
         string[] PathPart = rule.Path.Split('/', '\\', System.StringSplitOptions.RemoveEmptyEntries);
 

@@ -24,11 +24,11 @@ public class ProjectFilesWindow : EditorWindow
 
     public bool IsDirty;
     
-    [MenuItem("Window/ZjustOps/Project files")]
+    [MenuItem("Window/Zjustan/Project files manager")]
     static void Init()
     {
         // Get existing open window or if none, make a new one:
-        window = (ProjectFilesWindow)EditorWindow.GetWindow<ProjectFilesWindow>(false, "Project file management");
+        window = (ProjectFilesWindow)EditorWindow.GetWindow<ProjectFilesWindow>(false, "Project file manager");
         window.Show();
 
     }
