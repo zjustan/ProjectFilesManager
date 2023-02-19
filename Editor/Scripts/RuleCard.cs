@@ -202,9 +202,10 @@ public class RuleCard
     {
         if (!AssetDatabase.IsValidFolder(rule.Path))
         {
-            if (pathField.panel.focusController.focusedElement == pathField)
+            if (pathField != null && pathField.focusController != null && pathField.focusController.focusedElement == pathField)
                 return;
-            rule.Path = "Assets/";
+            SetPath( "Assets/");
+            return;
         }
         PathEditor.Clear();
 
