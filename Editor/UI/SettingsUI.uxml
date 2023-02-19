@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:GroupBox style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; height: 100%; max-height: none; min-height: auto; flex-direction: column; justify-content: space-between;">
+        <ui:ScrollView name="RuleCards" vertical-scroller-visibility="Hidden" style="height: auto; max-height: none; min-height: auto;" />
+        <ui:GroupBox style="flex-direction: row; justify-content: space-between;">
+            <ui:Button text="New rule" display-tooltip-when-elided="true" name="NewButton" style="width: 30%;" />
+            <ui:Button text="Save" display-tooltip-when-elided="true" name="SaveButton" style="width: 30%;" />
+            <ui:Button text="Reload" display-tooltip-when-elided="true" name="LoadButton" style="width: 30%;" />
+        </ui:GroupBox>
+    </ui:GroupBox>
+</ui:UXML>

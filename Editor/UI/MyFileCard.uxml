@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:GroupBox name="MainBox" style="background-color: rgba(0, 0, 0, 0.05); border-top-left-radius: 6px; border-bottom-left-radius: 6px; border-top-right-radius: 6px; border-bottom-right-radius: 6px;">
+        <ui:GroupBox style="flex-direction: row; justify-content: space-between; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
+            <ui:GroupBox name="Text" style="margin-left: 3px; margin-right: 3px; margin-top: 3px; margin-bottom: 3px; padding-left: 3px; padding-right: 3px; padding-top: 3px; padding-bottom: 3px;">
+                <ui:Label text="Title" display-tooltip-when-elided="true" name="Title" />
+                <ui:Label text="Path" display-tooltip-when-elided="true" name="Path" style="font-size: 8px;" />
+            </ui:GroupBox>
+            <ui:GroupBox name="Actions" style="margin-left: 3px; margin-right: 3px; margin-top: 3px; margin-bottom: 3px; padding-left: 3px; padding-right: 3px; padding-top: 3px; padding-bottom: 3px;">
+                <ui:Button text="Fix" display-tooltip-when-elided="true" name="Fix" />
+                <ui:Button text="More" display-tooltip-when-elided="true" name="More" />
+            </ui:GroupBox>
+        </ui:GroupBox>
+        <ui:GroupBox name="MessageBox" style="flex-direction: row; justify-content: flex-start; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 5px; padding-right: 5px; padding-top: 0; padding-bottom: 0; align-items: center; display: flex; overflow: visible;">
+            <ui:VisualElement name="WarningIcon" style="background-image: url(&apos;project://database/Packages/com.unity.collab-proxy/Editor/Collaborate/Assets/Icons/status-warning-dark@2x.png?fileID=2800000&amp;guid=98d032c68be4a784ab77b461c5341fc8&amp;type=3#status-warning-dark@2x&apos;); width: 32px; height: 32px; display: none; max-width: 32px; min-width: 32px; max-height: 32px;" />
+            <ui:VisualElement name="ErrorIcon" style="background-image: url(&apos;project://database/Packages/com.unity.collab-proxy/Editor/Collaborate/Assets/Icons/status-error-dark@2x.png?fileID=2800000&amp;guid=a0fdac62174ca014b94a537688fc684d&amp;type=3#status-error-dark@2x&apos;); width: 32px; height: 32px; display: flex; max-height: 32px; min-height: 32px; max-width: 32px; min-width: 32px;" />
+            <ui:VisualElement name="SuccesIcon" style="background-image: url(&apos;project://database/Packages/com.unity.collab-proxy/Editor/PlasticSCM/Assets/Images/stepok@2x.png?fileID=2800000&amp;guid=be340a165cb9c8d4cb50f1deeb51d4ea&amp;type=3#stepok@2x&apos;); width: 32px; height: 32px; display: none; max-width: 32px; max-height: 32px; min-height: 32px;" />
+            <ui:Label text="Message Me MessagessageMessageMessageMessage" display-tooltip-when-elided="true" name="Message" style="white-space: normal; flex-wrap: wrap; padding-left: 0; padding-right: 30px;" />
+        </ui:GroupBox>
+    </ui:GroupBox>
+</ui:UXML>

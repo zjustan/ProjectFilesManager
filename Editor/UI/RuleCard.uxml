@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:GroupBox style="background-color: rgba(0, 0, 0, 0.05); border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px;">
+        <ui:TextField picking-mode="Ignore" label="Rule name" name="RuleNameField" />
+        <ui:GroupBox name="PathEditor" style="flex-direction: row; align-items: center;" />
+        <ui:TextField picking-mode="Ignore" label="Applied Path" text="Use relative path" name="PathField" style="display: flex; overflow: hidden;" />
+        <ui:TextField picking-mode="Ignore" label="Allowed Extensions" text="split using ," name="ExtensionsField" />
+        <ui:GroupBox name="SuggestionBox">
+            <ui:Label text="Recommended file extensions" display-tooltip-when-elided="true" />
+            <ui:GroupBox name="AddExtensions" style="flex-direction: row; overflow: hidden; flex-wrap: wrap;" />
+            <ui:Label text="Aliases" display-tooltip-when-elided="true" />
+            <ui:GroupBox name="AddAliases" style="flex-direction: row;" />
+        </ui:GroupBox>
+        <ui:GroupBox style="flex-direction: row; justify-content: space-between; align-items: flex-end;">
+            <ui:GroupBox style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;">
+                <ui:Toggle label="Apply to subfolders" name="SubfolderToggle" style="align-items: auto;" />
+                <ui:Toggle label="Deny Extensions" name="DenyToggle" style="align-items: auto;" />
+            </ui:GroupBox>
+            <ui:Button text="Remove" display-tooltip-when-elided="true" name="RemoveButton" />
+        </ui:GroupBox>
+    </ui:GroupBox>
+</ui:UXML>

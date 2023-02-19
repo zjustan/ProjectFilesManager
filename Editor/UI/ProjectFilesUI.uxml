@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:GroupBox name="NavBars" style="flex-direction: row; flex-wrap: nowrap; flex-shrink: 0; align-items: stretch; justify-content: center;">
+        <ui:Button text="My files" display-tooltip-when-elided="true" name="FileButton" style="width: 50%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;" />
+        <ui:Button text="Settings" display-tooltip-when-elided="true" name="SettingsButton" style="width: 50%;" />
+    </ui:GroupBox>
+    <ui:VisualElement name="UIParent" />
+</ui:UXML>
