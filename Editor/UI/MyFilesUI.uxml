@@ -2,5 +2,5 @@
     <ui:GroupBox style="align-items: center; flex-direction: row; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; justify-content: center;">
         <ui:Button text="Fix all" display-tooltip-when-elided="true" name="FixAllAction" style="width: 90%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
     </ui:GroupBox>
-    <ui:ScrollView name="View" horizontal-scroller-visibility="Hidden" />
+    <ui:ScrollView name="View" horizontal-scroller-visibility="Hidden" style="flex-grow: initial; flex-shrink: initial;" />
 </ui:UXML>

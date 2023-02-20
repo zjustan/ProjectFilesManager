@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:GroupBox name="GroupBox" style="max-width: none; min-width: auto; min-height: auto; width: 100%; height: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-right: 10px; padding-left: 10px; justify-content: center; align-items: stretch;">
+        <ui:Label text="enter folder name:" />
+        <ui:TextField picking-mode="Ignore" text="New Folder" name="TextField" />
+    </ui:GroupBox>
+</ui:UXML>

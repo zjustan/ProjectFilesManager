@@ -20,7 +20,7 @@ public class Rule
     public string[] DetectedAliases;
     public string Path;
     public bool DenyExtensions;
-    public bool ApplyToSubfolder;
+    public bool ApplyToSubfolder = true;
     public string[] IgnoredFiles;
 
     public Rule()

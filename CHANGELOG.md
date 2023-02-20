@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+[1.0.3] - 2023-2-20
+
+### Added
+ - New folder dialog when using the path editor
+
+### Fixed
+ - Unable to save for the first time
+ - Multiple rules creates when pressing New rule Button
+ - My files UI not creating a flexbox Correctly
+
 
 [1.0.2] - 2023-2-19
 

@@ -129,8 +129,7 @@ public class RuleCard
         {
             var button = new Button(() =>
             {
-                rule.Extensions += $", {extension}";
-                extensionsField.value = rule.Extensions;
+                AddExtension(extension);
             });
             button.text = extension;
             extensionsParent.Add(button);
@@ -184,13 +183,7 @@ public class RuleCard
 
             var button = new Button(() =>
             {
-                if (string.IsNullOrEmpty(rule.Extensions))
-                    rule.Extensions = alias.Name;
-                else if (rule.Extensions.EndsWith(','))
-                    rule.Extensions += $" {alias.Name}";
-                else
-                    rule.Extensions += $", {alias.Name}";
-                extensionsField.value = rule.Extensions;
+                AddExtension(alias.Name);
             });
             button.text = alias.Name;
             button.tooltip = $"adds an alias for the files: {(string.IsNullOrEmpty(alias.ToolTip) ? string.Join(", ", alias.Refers) : alias.ToolTip)}";
@@ -198,6 +191,17 @@ public class RuleCard
         }
     }
 
+    private void AddExtension(string Addition)
+    {
+        if (string.IsNullOrEmpty(rule.Extensions))
+            rule.Extensions = Addition;
+        else if (rule.Extensions.EndsWith(','))
+            rule.Extensions += $" {Addition}";
+        else
+            rule.Extensions += $", {Addition}";
+        extensionsField.value = rule.Extensions;
+        InitDirty();
+    }
     public void CreatePathEditor()
     {
         if (!AssetDatabase.IsValidFolder(rule.Path))
@@ -276,8 +280,13 @@ public class RuleCard
         genericMenu.AddItem(new GUIContent("(+) New folder"), false, () =>
         {
 
-            AssetDatabase.CreateFolder(path, "New folder");
-            EditorUtility.FocusProjectWindow();
+            NewFolderDialog.ShowNewFolder(path, (x) =>
+            {
+                AssetDatabase.CreateFolder(path, x);
+                SetPath( Path.Join(path, x));
+                EditorUtility.FocusProjectWindow();
+            });
+
         }
         );
         genericMenu.ShowAsContext();
@@ -285,7 +294,7 @@ public class RuleCard
 
     public void SetPath(string Path)
     {
-        rule.Path = Path;
+        rule.Path = Path.Replace('\\','/');
         CreatePathEditor();
         CreateSuggestions();
 

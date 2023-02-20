@@ -22,8 +22,10 @@ public class ProjectFilesWindow : EditorWindow
     List<Rule> rules;
     Dictionary<VisualElement, Action> FunctionHandler;
 
+
     public bool IsDirty;
-    
+    private bool SettingsInitialize;
+
     [MenuItem("Window/Zjustan/Project files manager")]
     static void Init()
     {
@@ -266,11 +268,17 @@ public class ProjectFilesWindow : EditorWindow
         {
             new RuleCard(ParentElement, rule, rules);
         }
+
+        if (SettingsInitialize)
+            return;
+
+        SettingsInitialize = true;
         var newButton = SettingsUI.Q<Button>("NewButton");
         newButton.clicked += () =>
         {
             var rule = new Rule();
             rules.Add(rule);
+            SetSettingsDirty();
             Settings();
         };
 
@@ -292,11 +300,6 @@ public class ProjectFilesWindow : EditorWindow
         var path = string.Join("/", splittedPath[0..^1]);
 
         path += "/ProjectSettings/ProjectFileRules.json";
-
-        if (!File.Exists(path))
-        {
-            File.Create(path);
-        }
 
         var formatter = new JsonSerializerSettings().Formatting = Formatting.Indented;
         string json = JsonConvert.SerializeObject(rules, formatter);

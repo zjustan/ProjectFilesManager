@@ -1,6 +1,6 @@
 {
   "name": "com.zjustan.projectfilesmanager",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "displayName": "Project Files Manager",
   "description": "Easily manage your project by setting up rules for your folders.\n it will warn you when a file is in the wrong place and it will auto fix it for you",
   "unity": "2019.1",
