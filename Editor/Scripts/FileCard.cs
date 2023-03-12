@@ -5,20 +5,28 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
+/// <summary>
+/// responsible for rendering a single file information card
+/// </summary>
 public class FileCard
 {
     private static VisualTreeAsset treeAsset { get; set; }
     public VisualElement RootvisualElement { get; private set; }
 
     private VisualElement element;
-    public string FilePath { get; private set; }
-    public string AssetPath { get; private set; }
-    public string FileName { get; private set; }
 
-    public Object AssetObject { get; private set; }
+    public readonly FaultyFile faultyFile;
+    public string FilePath { get => faultyFile.AbsolutePath; }
+    public string AssetPath { get => faultyFile.AssetPath; }
+    public string FileName { get => faultyFile.FileInfo.Name; }
 
-    public FileInfo AssetFileInfo { get; private set; }
-    public Rule BrokenRule { get; private set; }
+    public Object AssetObject { 
+        get => faultyFile.UnityObject; 
+        set => faultyFile.UnityObject = value; 
+    }
+
+    public FileInfo AssetFileInfo { get => faultyFile.FileInfo; }
+    public Rule BrokenRule { get => faultyFile.BrokenRule; }
 
     public Action OnFixClick
     {
@@ -53,16 +61,12 @@ public class FileCard
     {
         treeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.zjustan.projectfilesmanager/Editor/UI/MyFileCard.uxml");
     }
-    public FileCard(VisualElement RootvisualElement, string FilePath, string AssetPath, Rule rule, string Filename)
+    public FileCard(VisualElement RootvisualElement, FaultyFile faultyFileRef)
     {
+        faultyFile = faultyFileRef;
         this.RootvisualElement = RootvisualElement;
-        this.FilePath = FilePath;
-        this.AssetPath = AssetPath;
-        this.FileName = Filename;
-        this.BrokenRule = rule;
 
         AssetObject = AssetDatabase.LoadMainAssetAtPath(AssetPath);
-        AssetFileInfo = new FileInfo(FilePath);
 
         element = treeAsset.Instantiate();
 
@@ -75,7 +79,7 @@ public class FileCard
         })
     );
 
-        element.Q<Label>(titleName).text = Filename;
+        element.Q<Label>(titleName).text = FileName;
         element.Q<Label>(pathName).text = AssetPath;
 
         SetStatusIcon(WarningIcon);

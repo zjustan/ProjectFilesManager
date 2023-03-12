@@ -27,15 +27,17 @@ public class Rule
     {
         ProcessExtensions();
     }
-    public bool ComparePaths(string AssetPath)
+    public bool ComparePaths(string AssetPath, string AssetGUID)
     {
+        //check if path is empty
         if (string.IsNullOrEmpty(Path))
             return false;
 
-        if (IgnoredFiles != null && IgnoredFiles.Contains(AssetDatabase.AssetPathToGUID(AssetPath)))
+        //check if file needs to be ignored
+        if (IgnoredFiles != null && IgnoredFiles.Contains(AssetGUID))
             return false;
 
-
+        //create path strings that are safe to check
         var SafeAssetPath = AssetPath.Replace("\\", "/");
         var SafePath = Path.Replace("\\", "/");
 
@@ -52,6 +54,7 @@ public class Rule
         {
             SafeAssetPath = SafeAssetPath.Substring(1);
         }
+        //if applies to subfolder only check the beginning of the string
         if (ApplyToSubfolder)
             return SafeAssetPath.StartsWith(SafePath);
         else
@@ -67,6 +70,8 @@ public class Rule
     {
         List<string> extensions = new List<string>();
         
+
+        //remove unneeded characters and split
         if (!string.IsNullOrEmpty(Extensions))
             extensions.AddRange(Extensions.Replace(" ", string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries));
 
@@ -88,6 +93,9 @@ public class Rule
 
     public bool Complies(string extension)
     {
+        //check if extension complies with rules
+
+        //if the extension contains any then it will always comply unless deny extension is enabled
         if (_Extensions.ToLower().Equals("any"))
             return !DenyExtensions;
 

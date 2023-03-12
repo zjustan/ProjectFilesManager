@@ -1,18 +1,14 @@
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.TerrainUtils;
 using UnityEngine.UIElements;
 
 public class ProjectFilesWindow : EditorWindow
 {
     private const string ProjectFileWindowIndex = "ProjectFileWindowIndex";
-    public readonly char[] SeperatorChars = new char[2] { Path.PathSeparator, Path.AltDirectorySeparatorChar };
-    private static ProjectFilesWindow window;
+    public static ProjectFilesWindow window;
 
     VisualElement FileTreeUI;
     VisualElement SettingsUI;
@@ -25,6 +21,7 @@ public class ProjectFilesWindow : EditorWindow
 
     public bool IsDirty;
     private bool SettingsInitialize;
+    public HashSet<GUID> FaultyFileGUIDs;
 
     [MenuItem("Window/Zjustan/Project files manager")]
     static void Init()
@@ -64,7 +61,7 @@ public class ProjectFilesWindow : EditorWindow
             { SettingsUI,Settings},
         };
 
-        AssetChangesDectector.OnAssetChanged += FileTree;
+        FaultyAssetHandler.OnAssetChanged += FileTree;
 
 
         if (EditorPrefs.HasKey(ProjectFileWindowIndex))
@@ -112,7 +109,7 @@ public class ProjectFilesWindow : EditorWindow
     {
         var scrollview = FileTreeUI.Q<ScrollView>("View");
         scrollview.Clear();
-        var cards = Search(Application.dataPath, scrollview);
+        var cards = BuildCards(Application.dataPath, scrollview);
         if (cards.Count == 0)
             scrollview.Add(new Label("There are no issues with any files :)"));
         var fixAllButton = FileTreeUI.Q<Button>("FixAllAction");
@@ -121,29 +118,17 @@ public class ProjectFilesWindow : EditorWindow
 
     }
 
-    public List<FileCard> Search(string SourcePath, ScrollView scrollView)
+    public List<FileCard> BuildCards(string SourcePath, ScrollView scrollView)
     {
         List<FileCard> cards = new List<FileCard>();
-        foreach (string file in Directory.EnumerateFiles(SourcePath, "*.*", SearchOption.AllDirectories).Where(x => !x.EndsWith(".meta")))
+        FaultyFileGUIDs = new HashSet<GUID>();
+        foreach (FaultyFile file in FaultyAssetHandler.faultyFiles)
         {
-            FileInfo fileInfo = new FileInfo(file);
+            FileCard card = new FileCard(scrollView, file);
 
-            string AssetString = file.Remove(0, SourcePath.Length - "Assets".Length);
-
-            Rule rule;
-            if (!TryFindBrokenRule(AssetString, fileInfo.Extension, out rule))
-                continue;
-
-
-            string viewString = AssetString;
-            if (viewString.StartsWith('\\'))
-                viewString = viewString.Substring(1);
-
-
-            FileCard card = new FileCard(scrollView, file, AssetString, rule, viewString.Split('\\').Last());
             card.OnFixClick = () => FixAsset(card, true);
             card.OnMoreClick = () => MoreOptions(card);
-            card.ShowWarning("broken " + rule.Name + " Rule");
+            card.ShowWarning("broken " + file.BrokenRule.Name + " Rule");
 
             cards.Add(card);
         }
@@ -182,200 +167,129 @@ public class ProjectFilesWindow : EditorWindow
         SaveSettings();
 
     }
-    public bool TryFindBrokenRule(string AssetPath, string Extension, out Rule rule)
-    {
-        rule = null;
-        foreach (var possibleRule in rules)
-        {
-            if (CheckIfRuleIsBroken(possibleRule, AssetPath, Extension))
-            {
-                rule = possibleRule;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public bool TryFindFixingRule(FileCard info, out Rule rule)
-    {
-        rule = null;
-        foreach (var possibleRule in rules)
-        {
-            if (CheckIfRuleCanFix(possibleRule, info))
-            {
-                rule = possibleRule;
-                return true;
-            }
-        }
-        return false;
-    }
-    public bool CheckIfRuleCanFix(Rule rule, FileCard info)
-    {
-        return rule.Complies(info.AssetFileInfo.Extension);
-    }
-
-    public bool CheckIfRuleIsBroken(Rule rule, string AssetPath, string Extension)
-    {
-        if (!rule.ComparePaths(AssetPath))
-            return false;
-
-        return !(rule.Complies(Extension));
-    }
     public void FixAsset(FileCard card, bool ShowAssetAfter = false)
     {
-
-        Rule rule = null;
-        if (!TryFindFixingRule(card, out rule))
+         FaultyAssetHandler.PerformFix( card.faultyFile);
+        if (!card.faultyFile.IsFixed)
         {
             card.ShowError("There is no rule to fix this, please resolve manualy");
             return;
         }
 
-        if (!AssetDatabase.IsValidFolder(rule.Path))
+        card.ShowSucces("File has been moved to " + card.faultyFile.FixingRule.Path);
+        if (ShowAssetAfter)
         {
-            string[] PathParts = rule.Path.Split(SeperatorChars, StringSplitOptions.RemoveEmptyEntries);
-            string[] ParentPath = PathParts[0..^1];
-            AssetDatabase.CreateFolder(string.Join('\\', ParentPath), PathParts[^1]);
-        }
-
-        string NewAssetPath = Path.Combine(rule.Path, card.AssetFileInfo.Name);
-        string result = AssetDatabase.MoveAsset(card.AssetPath, NewAssetPath);
-
-        if (string.IsNullOrEmpty(result))
-        {
-            card.ShowSucces("File has been moved to " + rule.Path);
-            if (ShowAssetAfter)
-            {
-                var obj = AssetDatabase.LoadMainAssetAtPath(NewAssetPath);
-                EditorGUIUtility.PingObject(obj);
-                Selection.activeObject = obj;
-            }
+            var obj = AssetDatabase.LoadMainAssetAtPath(card.AssetPath);
+            EditorGUIUtility.PingObject(obj);
+            Selection.activeObject = obj;
         }
         else
         {
-            card.ShowError(result);
+            card.ShowError(card.faultyFile.Message);
 
         }
     }
 
     public void Settings()
-    {
-        var ParentElement = SettingsUI.Q<ScrollView>("RuleCards");
-        ParentElement.Clear();
+{
+    var ParentElement = SettingsUI.Q<ScrollView>("RuleCards");
+    ParentElement.Clear();
 
-        if(rules != null)
+    if (rules != null)
         foreach (Rule rule in rules)
         {
             new RuleCard(ParentElement, rule, rules);
         }
 
-        if (SettingsInitialize)
+    if (SettingsInitialize)
+        return;
+
+    SettingsInitialize = true;
+    var newButton = SettingsUI.Q<Button>("NewButton");
+    newButton.clicked += () =>
+    {
+        var rule = new Rule();
+        rules.Add(rule);
+        SetSettingsDirty();
+        Settings();
+    };
+
+    var saveButton = SettingsUI.Q<Button>("SaveButton");
+    saveButton.clicked += SaveSettings;
+
+    var ReloadButton = SettingsUI.Q<Button>("LoadButton");
+    ReloadButton.clicked += () =>
+    {
+
+        LoadSettings();
+        Settings();
+
+    };
+}
+
+public void SaveSettings()
+{
+    ProjectFileSettings.rules = rules;
+    ProjectFileSettings.SaveSettings();
+
+    SetSettingsClean();
+
+
+}
+
+public void SetSettingsDirty()
+{
+    if (IsDirty)
+        return;
+
+    IsDirty = true;
+    titleContent.text = titleContent.text + '*';
+}
+
+private void SetSettingsClean()
+{
+    if (!IsDirty)
+        return;
+
+    IsDirty = false;
+
+    titleContent.text = titleContent.text.TrimEnd('*');
+
+}
+public void LoadSettings()
+{
+    if (IsDirty)
+    {
+        bool result = EditorUtility.DisplayDialog("Unsaved changes",
+                                                   "You are about to reload the settings, but there are changes that are not saved, do you wish to continue",
+                                                   "yes",
+                                                   "no");
+        if (!result)
             return;
-
-        SettingsInitialize = true;
-        var newButton = SettingsUI.Q<Button>("NewButton");
-        newButton.clicked += () =>
-        {
-            var rule = new Rule();
-            rules.Add(rule);
-            SetSettingsDirty();
-            Settings();
-        };
-
-        var saveButton = SettingsUI.Q<Button>("SaveButton");
-        saveButton.clicked += SaveSettings;
-
-        var ReloadButton = SettingsUI.Q<Button>("LoadButton");
-        ReloadButton.clicked += () => {
-
-            LoadSettings();
-            Settings();
-                
-                };
     }
+    ProjectFileSettings.LoadSettings();
+    rules = ProjectFileSettings.rules.ToList();
+    SetSettingsClean();
 
-    public void SaveSettings()
+}
+
+
+private void OnDestroy()
+{
+    if (IsDirty)
     {
-        var splittedPath = Application.dataPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
-        var path = string.Join("/", splittedPath[0..^1]);
+        bool result = EditorUtility.DisplayDialog("Unsaved changes",
+                                                 "You are about to close the window, but there are changes that are not saved, do you wish to continue",
+                                                 "Save and close",
+                                                 "Dont save and close"
+                                                 );
 
-        path += "/ProjectSettings/ProjectFileRules.json";
-
-        var formatter = new JsonSerializerSettings().Formatting = Formatting.Indented;
-        string json = JsonConvert.SerializeObject(rules, formatter);
-        File.WriteAllText(path, json);
-
-        SetSettingsClean();
-
-
-    }
-
-    public void SetSettingsDirty()
-    {
-        if (IsDirty)
-            return;
-
-        IsDirty = true;
-        titleContent.text = titleContent.text + '*';
-    }
-
-    private void SetSettingsClean()
-    {
-        if (!IsDirty)
-            return;
-
-        IsDirty = false;
-
-        titleContent.text = titleContent.text.TrimEnd('*');
-
-    }
-    public void LoadSettings()
-    {
-        if(IsDirty)
+        if (!result)
         {
-           bool result =  EditorUtility.DisplayDialog("Unsaved changes",
-                                                      "You are about to reload the settings, but there are changes that are not saved, do you wish to continue",
-                                                      "yes",
-                                                      "no");
-            if (!result)
-                return;
-        }
-        var splittedPath = Application.dataPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
-        var path = string.Join("/", splittedPath[0..^1]);
-
-        path += "/ProjectSettings/ProjectFileRules.json";
-
-        if (File.Exists(path))
-        {
-            string json = File.ReadAllText(path);
-            rules = JsonConvert.DeserializeObject<List<Rule>>(json);
-        }
-        else
-        {
-            rules = new List<Rule>();
-        }
-        SetSettingsClean();
-
-    }
-
-
-    private void OnDestroy()
-    {
-        if (IsDirty)
-        {
-            bool result = EditorUtility.DisplayDialog("Unsaved changes",
-                                                     "You are about to close the window, but there are changes that are not saved, do you wish to continue",
-                                                     "Save and close",
-                                                     "Dont save and close"
-                                                     );
-
-
-            if (!result)
-            {
-                SaveSettings();
-            }
+            SaveSettings();
         }
     }
+}
 }
 
 public class Data
