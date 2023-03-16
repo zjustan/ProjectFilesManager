@@ -178,7 +178,7 @@ class FaultyAssetHandler : AssetPostprocessor
 
 
         //create path if does not exist
-        if (!AssetDatabase.IsValidFolder(faultyFile.FixingRule.Path))
+        if (!AssetDatabase.IsValidFolder(FixingRule.Path))
         {
 
             string[] PathParts = FixingRule.Path.Split(SeperatorChars, StringSplitOptions.RemoveEmptyEntries);
